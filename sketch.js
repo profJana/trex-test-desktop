@@ -46,14 +46,12 @@ function preload() {
 function setup() {
   if (isMobileDevice()) {
     canvas = createCanvas(windowWidth, 300);
+    canvas.center();
   } else {
     canvas = createCanvas(600, 200); // Defina as dimensões desejadas para desktop
     canvas.center();
   }
 
-
-  var mensagem = "mensagem aleatória"
-  console.log(mensagem)
 
   //crie um sprite de trex
   trex = createSprite(50, 150, 20, 50);
@@ -68,11 +66,11 @@ function setup() {
   chaoInvisivel = createSprite(60, 230)
   chaoInvisivel.visible = false
 
-  gameOver = createSprite(300,100) // x,y
+  gameOver = createSprite(width/2,100) // x,y
   gameOver.addImage(gameOverImg)
   gameOver.scale = 0.5
 
-  restart = createSprite(300,140) // x,y
+  restart = createSprite(width/2,140) // x,y
   restart.addImage(restartImg)
   restart.scale = 0.5
 
@@ -109,10 +107,11 @@ function draw() {// desenhar
 
     var noChao = trex.collide(chaoInvisivel)
 
-    if (touches.length > 0 || keyDown("space") && noChao) { // E
+    if ( (touches.length > 0 || keyDown("space")) && noChao) { // E
       trex.velocityY = forcaPulo;
       somPulo.play();
       touches = []
+      console.log(touches)
     }
     trex.velocityY += gravidade;
 
@@ -138,8 +137,9 @@ function draw() {// desenhar
     grupoNuvens.setLifetimeEach(-1);
     grupoObstaculos.setLifetimeEach(-1);
 
-    if(mousePressedOver(restart)){
+    if(mousePressedOver(restart) || touches.length > 0){
       reset()
+      touches = []
     }
 
   }
@@ -150,7 +150,7 @@ function draw() {// desenhar
   drawSprites(); //desenha os sprite
   textSize(18)
   fill('black');
-  text("Score: " + score, 500, 30);
+  text("Score: " + score, width - 150, 30);
 
 }
 
@@ -170,12 +170,12 @@ function reset(){
 //criando a função
 function gerarNuvens() {
   if (frameCount % 60 === 0) {
-    nuvem = createSprite(650, 50, 40, 10);
+    nuvem = createSprite(width + 50, 50, 40, 10);
     nuvem.addImage('nuvem', nuvemImg)
     nuvem.velocityX = -3;
     nuvem.y = Math.round(random(30, 100));
 
-    nuvem.lifetime = 250
+    nuvem.lifetime = width + 50
     //formula: tempo = distancia/velocidade
     nuvem.depth = trex.depth;
     trex.depth = trex.depth + 1;
@@ -195,7 +195,7 @@ function gerarObstaculos() {
   }
 
   if (frameCount % intervaloBase === 0) { //gere obstaculos de 1 em 1 segundo
-    var obstaculo = createSprite(random(620, 700), 160, 10, 40);
+    var obstaculo = createSprite(width + 50, 160, 10, 40);
     //console.log(obstaculo.x)
     obstaculo.velocityX = -(6 + score/100);
     var rand = Math.round(random(1, 6));
@@ -217,7 +217,7 @@ function gerarObstaculos() {
         break;
     }
     obstaculo.scale = 0.5;
-    obstaculo.lifetime = 300;
+    obstaculo.lifetime = width + 50;
     //quando o break é executado pula pra ca
     grupoObstaculos.add(obstaculo);
  
