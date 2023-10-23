@@ -44,8 +44,13 @@ function preload() {
 }
 
 function setup() {
-  canvas = createCanvas(600, 200); //larg, alt
-  canvas.center();
+  if (isMobileDevice()) {
+    canvas = createCanvas(windowWidth, 300);
+  } else {
+    canvas = createCanvas(600, 200); // Defina as dimensões desejadas para desktop
+    canvas.center();
+  }
+
 
   var mensagem = "mensagem aleatória"
   console.log(mensagem)
@@ -104,9 +109,10 @@ function draw() {// desenhar
 
     var noChao = trex.collide(chaoInvisivel)
 
-    if (keyDown("space") && noChao) { // E
+    if (touches.length > 0 || keyDown("space") && noChao) { // E
       trex.velocityY = forcaPulo;
       somPulo.play();
+      touches = []
     }
     trex.velocityY += gravidade;
 
@@ -182,7 +188,13 @@ function gerarNuvens() {
 }
 
 function gerarObstaculos() {
-  if (frameCount % 60 === 0) { //gere obstaculos de 1 em 1 segundo
+
+  var intervaloBase = 60;
+  if(score > 500){
+    intervaloBase = 30;
+  }
+
+  if (frameCount % intervaloBase === 0) { //gere obstaculos de 1 em 1 segundo
     var obstaculo = createSprite(random(620, 700), 160, 10, 40);
     //console.log(obstaculo.x)
     obstaculo.velocityX = -(6 + score/100);
@@ -210,5 +222,9 @@ function gerarObstaculos() {
     grupoObstaculos.add(obstaculo);
  
   }
+}
+
+function isMobileDevice() {
+  return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 }
 
